@@ -5,7 +5,126 @@
 <br>
 
 
-### 1. Display all records from the database table in the UI table
+
+
+### 1. Add a record to the database.
+<br>
+
+#### Create Application Interfaces
+
+```csharp
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using SAS_Record_Management_System.Application.Features.Account.DTO;
+
+namespace SAS_Record_Management_System.Application.Features.Account.Interfaces
+{
+    public interface IstudentAccountRegistration
+    {   
+        Task AddAsync(StudentAccountRegistrationDTO dto);
+    }
+}
+
+
+```
+
+<br>
+
+
+
+
+#### Create Infrastructure Repository
+
+```csharp
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
+using SAS_Record_Management_System.Domain.Entities.Account;
+using SAS_Record_Management_System.Infrastructure.Persistence.Data;
+using SAS_Record_Management_System.Application.Features.Account.DTO;
+using SAS_Record_Management_System.Application.Features.Account.Interfaces;
+
+
+namespace SAS_Record_Management_System.Infrastructure.Features.Account
+{
+    public class StudentAccountRepository : IstudentAccountRegistration
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
+        public StudentAccountRepository(IMapper mapper, ApplicationDbContext context)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
+          
+        public async Task AddAsync(StudentAccountRegistrationDTO modelDomain)
+        {
+            var domain = _mapper.Map<StudentAccountRegistration>(modelDomain);
+            await _context.StudentAccountRegistrations_Db.AddAsync(domain);
+            await _context.SaveChangesAsync();
+        }
+
+
+    }
+}
+
+```
+
+
+<br>
+
+
+
+
+
+
+#### Create Application Services
+```csharp
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using SAS_Record_Management_System.Domain.Entities;
+using SAS_Record_Management_System.Application.Features.Account.DTO;
+using SAS_Record_Management_System.Application.Features.Account.Interfaces;
+
+namespace SAS_Record_Management_System.Application.Features.Account.Services
+{
+    public class StudentAccountRegistrationService
+    {
+        private readonly IstudentAccountRegistration _studentAccountRegistration;
+        public StudentAccountRegistrationService(IstudentAccountRegistration studentAccountRegistration)
+        {
+            _studentAccountRegistration = studentAccountRegistration;
+        }
+
+
+        public async Task<bool> RegisterAccountAsync(StudentAccountRegistrationDTO model)
+        {
+            await _studentAccountRegistration.AddAsync(model);
+            return true;
+        }
+
+
+
+    }
+}
+
+```
+
+
+<br>
+
+
+
+### 2. Display all records from the database table in the UI table
 
 <br>
 
@@ -129,7 +248,7 @@ namespace SAS_Record_Management_System.Application.Features.ViewAllStudentAccoun
 <br>
 
 
-### 2. Map table data into edit UI
+### 3. Map table data into edit UI
 
 <br>
 
